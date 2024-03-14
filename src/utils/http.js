@@ -1,17 +1,31 @@
 // axios基础封装
 import axios from 'axios'
 
-const httpInstance = axios.create({
-    baseURL: 'http://106.14.72.81:80',
-    timeout: 5000
+// 后端接口地址
+const serverInstance = axios.create({
+    baseURL: 'http://localhost:8080',
+    timeout: 5000,
 })
 
 // axios请求拦截器
-httpInstance.interceptors.request.use(config => {
+serverInstance.interceptors.request.use(config => {
     return config
 }, e => Promise.reject(e))
 
 // axios响应拦截器
-httpInstance.interceptors.response.use(res => res.data, e => Promise.reject(e))
+serverInstance.interceptors.response.use(res => res.data, e => Promise.reject(e))
 
-export default httpInstance
+const ossInstance = axios.create({
+    baseURL: 'http://106.14.72.81:81',
+    timeout: 5000
+})
+
+// axios请求拦截器
+ossInstance.interceptors.request.use(config => {
+    return config
+}, e => Promise.reject(e))
+
+// axios响应拦截器
+ossInstance.interceptors.response.use(res => res.data, e => Promise.reject(e))
+
+export { serverInstance, ossInstance }
