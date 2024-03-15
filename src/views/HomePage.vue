@@ -8,6 +8,8 @@ const logout = () => {
     userStore.logout();
     router.replace('/login');
 }
+const routeList = ['/users', '/orgs', '/articles', '/categorys', '/goods', '/orders']
+const routeIndex = routeList.indexOf(router.currentRoute.value.path)+1
 </script>
 
 <template>
@@ -26,44 +28,44 @@ const logout = () => {
                     </el-text>
                 </el-col>
                 <el-col :span="2" style="text-align: center; line-height: 56px;">
-                    <el-button type="normal" :icon="SwitchButton" @click="logout" text>退出登录</el-button>
+                    <el-button type="default" :icon="SwitchButton" @click="logout" text>退出登录</el-button>
                 </el-col>
             </el-row>
         </el-header>
         <el-container>
-            <el-aside width="200px">
-                <el-menu id="SideMenu">
-                    <el-menu-item index="1">
+            <el-aside width="140px">
+                <el-menu id="SideMenu" :default-active="routeIndex.toString()">
+                    <el-menu-item index="1" @click="()=>router.push('/users')">
                         <el-icon>
                             <User />
                         </el-icon>
                         <span>用户管理</span>
                     </el-menu-item>
-                    <el-menu-item index="2">
+                    <el-menu-item index="2" @click="()=>router.push('/orgs')">
                         <el-icon>
                             <OfficeBuilding />
                         </el-icon>
                         <span>组织管理</span>
                     </el-menu-item>
-                    <el-menu-item index="3">
+                    <el-menu-item index="3" @click="()=>router.push('/articles')">
                         <el-icon>
                             <Tickets />
                         </el-icon>
                         <span>文章管理</span>
                     </el-menu-item>
-                    <el-menu-item index="4">
+                    <el-menu-item index="4" @click="()=>router.push('/categorys')">
                         <el-icon>
                             <CollectionTag />
                         </el-icon>
                         <span>类别管理</span>
                     </el-menu-item>
-                    <el-menu-item index="5">
+                    <el-menu-item index="5" @click="()=>router.push('/goods')">
                         <el-icon>
                             <Goods />
                         </el-icon>
                         <span>商品管理</span>
                     </el-menu-item>
-                    <el-menu-item index="6">
+                    <el-menu-item index="6" @click="()=>router.push('/orders')">
                         <el-icon>
                             <ShoppingCart />
                         </el-icon>
@@ -72,9 +74,7 @@ const logout = () => {
                 </el-menu>
             </el-aside>
             <el-main>
-                <RouterView>
-                    <div>欢迎使用</div>
-                </RouterView>
+                <RouterView />
             </el-main>
         </el-container>
     </el-container>
