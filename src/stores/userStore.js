@@ -9,7 +9,7 @@ export const useUserStore = defineStore('user', {
         }
     },
     actions: {
-        login(name,jwt) {
+        login(name, jwt) {
             this.isLogin = true
             this.name = name
             this.jwt = jwt

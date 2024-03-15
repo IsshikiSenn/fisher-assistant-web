@@ -2,14 +2,27 @@
 import { SwitchButton } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/userStore';
 import { useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
+import { serverInstance } from '@/utils/http'
+
 const router = useRouter();
 const userStore = useUserStore();
 const logout = () => {
     userStore.logout();
+
+    serverInstance.interceptors.request.use(config => {
+                config.headers['token']=''
+                return config
+            }, e => Promise.reject(e))
     router.replace('/login');
 }
 const routeList = ['/users', '/orgs', '/articles', '/categorys', '/goods', '/orders']
-const routeIndex = routeList.indexOf(router.currentRoute.value.path)+1
+const routeIndex = routeList.indexOf(router.currentRoute.value.path) + 1
+
+if (userStore.isLogin == false && router.currentRoute.value.path != '/login') {
+    ElMessage.error('请登录！')
+    router.replace('/login');
+}
 </script>
 
 <template>
@@ -35,37 +48,37 @@ const routeIndex = routeList.indexOf(router.currentRoute.value.path)+1
         <el-container>
             <el-aside width="140px">
                 <el-menu id="SideMenu" :default-active="routeIndex.toString()">
-                    <el-menu-item index="1" @click="()=>router.push('/users')">
+                    <el-menu-item index="1" @click="() => router.push('/users')">
                         <el-icon>
                             <User />
                         </el-icon>
                         <span>用户管理</span>
                     </el-menu-item>
-                    <el-menu-item index="2" @click="()=>router.push('/orgs')">
+                    <el-menu-item index="2" @click="() => router.push('/orgs')">
                         <el-icon>
                             <OfficeBuilding />
                         </el-icon>
                         <span>组织管理</span>
                     </el-menu-item>
-                    <el-menu-item index="3" @click="()=>router.push('/articles')">
+                    <el-menu-item index="3" @click="() => router.push('/articles')">
                         <el-icon>
                             <Tickets />
                         </el-icon>
                         <span>文章管理</span>
                     </el-menu-item>
-                    <el-menu-item index="4" @click="()=>router.push('/categorys')">
+                    <el-menu-item index="4" @click="() => router.push('/categorys')">
                         <el-icon>
                             <CollectionTag />
                         </el-icon>
                         <span>类别管理</span>
                     </el-menu-item>
-                    <el-menu-item index="5" @click="()=>router.push('/goods')">
+                    <el-menu-item index="5" @click="() => router.push('/goods')">
                         <el-icon>
                             <Goods />
                         </el-icon>
                         <span>商品管理</span>
                     </el-menu-item>
-                    <el-menu-item index="6" @click="()=>router.push('/orders')">
+                    <el-menu-item index="6" @click="() => router.push('/orders')">
                         <el-icon>
                             <ShoppingCart />
                         </el-icon>

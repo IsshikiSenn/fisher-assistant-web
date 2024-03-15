@@ -4,13 +4,14 @@ import { login } from '@/apis/login.js'
 import { ElMessage } from 'element-plus';
 import { useUserStore } from '@/stores/userStore';
 import { useRouter } from 'vue-router';
+import { serverInstance } from '@/utils/http'
 
 // do not use same name with ref
 const form = reactive({
     username: '',
     password: '',
 })
-var logging = ref(false)
+const logging = ref(false)
 const userStore = useUserStore()
 const router = useRouter()
 const onSubmit = () => {
@@ -23,6 +24,10 @@ const onSubmit = () => {
                 type: 'success'
             })
             userStore.login(res.data.name, res.data.jwt)
+            serverInstance.interceptors.request.use(config => {
+                config.headers['token'] = res.data.jwt
+                return config
+            }, e => Promise.reject(e))
             router.replace('/')
         }
         else {

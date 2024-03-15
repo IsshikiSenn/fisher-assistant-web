@@ -3,7 +3,7 @@ import axios from 'axios'
 
 // 后端接口地址
 const serverInstance = axios.create({
-    baseURL: 'http://localhost:8080',
+    baseURL: 'http://106.14.72.81:6615',
     timeout: 5000,
 })
 

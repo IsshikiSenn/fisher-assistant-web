@@ -1,16 +1,14 @@
 <script setup>
-import { useUserStore } from './stores/userStore';
-import { useRouter } from 'vue-router';
-import { ElMessage } from 'element-plus';
+import { useUserStore } from '@/stores/userStore'
+import { serverInstance } from "@/utils/http";
 
-const router = useRouter();
-const userStore = useUserStore();
-if (userStore.isLogin == false && router.currentRoute != '/login') {
-  ElMessage.error('请登录！')
-  router.replace('/login');
-}
+const userStore = useUserStore()
+
+serverInstance.interceptors.request.use(config => {
+    config.headers['token'] = userStore.jwt
+    return config
+}, e => Promise.reject(e))
 </script>
-
 <template>
   <RouterView />
 </template>

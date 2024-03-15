@@ -1,8 +1,9 @@
 <script setup>
-import { getArticles, addArticle, updateArticle, deleteArticle } from '@/apis/articles'
+import { useArticleApi } from '@/apis/article-api'
 import { reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus';
 
+const articleApi = useArticleApi()
 const articleList = reactive({
     total: 0,
     rows: []
@@ -61,7 +62,7 @@ const showDeleteDialog = (id) => {
 }
 
 const handleAddArticle = (data) => {
-    addArticle(data).then((res) => {
+    articleApi.addArticle(data).then((res) => {
         if (res.code == 1) {
             ElMessage({
                 message: '新增成功！',
@@ -76,8 +77,8 @@ const handleAddArticle = (data) => {
     dialogForm.visible = false
 }
 
-const handleEditArtcle = (data) => {
-    updateArticle(data).then((res) => {
+const handleEditArticle = (data) => {
+    articleApi.updateArticle(data).then((res) => {
         if (res.code == 1) {
             ElMessage({
                 message: '编辑成功！',
@@ -93,7 +94,7 @@ const handleEditArtcle = (data) => {
 }
 
 const handleDeleteArticle = (id) => {
-    deleteArticle(id).then((res) => {
+    articleApi.deleteArticle(id).then((res) => {
         if (res.code == 1) {
             ElMessage({
                 message: '删除成功！',
@@ -108,7 +109,7 @@ const handleDeleteArticle = (id) => {
 
 const handleQuery = () => {
     query.loading = true
-    getArticles(query.page, query.pageSize, query.title, query.author).then((res) => {
+    articleApi.getArticles(query.page, query.pageSize, query.title, query.author).then((res) => {
         if (res.code == 1) {
             console.log(res.data);
             articleList.total = res.data.total
@@ -119,6 +120,12 @@ const handleQuery = () => {
             ElMessage.error(res.msg)
         }
     })
+}
+
+const resetQuery = () => {
+    query.title = ''
+    query.author = ''
+    handleQuery()
 }
 
 const handleSizeChange = (val) => {
@@ -154,9 +161,14 @@ handleQuery()
                     <el-input v-model="query.author" placeholder="请输入作者" />
                 </el-form-item>
             </el-col>
-            <el-col :span="2">
+            <el-col :span="1">
                 <el-form-item>
-                    <el-button type="primary" @click="handleQuery" :loading="query.loading">查询</el-button>
+                    <el-button type="primary" @click="handleQuery" :loading="query.loading" size="small">查询</el-button>
+                </el-form-item>
+            </el-col>
+            <el-col :span="1">
+                <el-form-item>
+                    <el-button type="default" @click="resetQuery" size="small">重置</el-button>
                 </el-form-item>
             </el-col>
         </el-row>
@@ -178,7 +190,7 @@ handleQuery()
             <el-table-column label="操作" width="140">
                 <template #default="scope">
                     <el-button size="small"
-                        @click="showFormDialog('编辑文章信息', scope.row, handleEditArtcle)">编辑</el-button>
+                        @click="showFormDialog('编辑文章信息', scope.row, handleEditArticle)">编辑</el-button>
                     <el-button size="small" type="danger" @click="showDeleteDialog(scope.row.id)">删除</el-button>
                 </template>
             </el-table-column>
@@ -186,7 +198,7 @@ handleQuery()
 
         <!-- 分页控件 -->
         <el-pagination v-model:current-page="query.page" v-model:page-size="query.pageSize" :page-sizes="[5, 10, 20]"
-            background="true" layout="total, sizes, prev, pager, next, jumper" :total="articleList.total"
+            background layout="total, sizes, prev, pager, next, jumper" :total="articleList.total"
             @size-change="handleSizeChange" @current-change="handleCurrentChange" />
 
         <!-- 对话框 -->
@@ -216,4 +228,4 @@ handleQuery()
         </el-dialog>
     </div>
 
-</template>
+</template>@/apis/article-api
