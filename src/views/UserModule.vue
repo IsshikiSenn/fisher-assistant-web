@@ -2,6 +2,10 @@
 import { useUserApi } from '@/apis/user-api'
 import { reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { useUserStore } from '@/stores/userStore';
+import router from '@/router';
+
+const userStore = useUserStore()
 
 const userApi = useUserApi()
 const userList = reactive({
@@ -30,6 +34,7 @@ const dialogForm = reactive({
         orgId: '',
         certificateUrl: ''
     },
+    file: null,
     onConfirm: null
 })
 
@@ -77,6 +82,11 @@ const handleAddUser = (data) => {
                 type: 'success'
             })
         }
+        else if (res.code == 0 && res.msg == 'NOT_LOGIN') {
+            userStore.logout()
+            router.replace('/login')
+            ElMessage.error('登录过期，请登重新登录！')
+        }
         else {
             ElMessage.error(res.msg)
         }
@@ -92,6 +102,11 @@ const handleEditUser = (data) => {
                 message: '编辑成功！',
                 type: 'success'
             })
+        }
+        else if (res.code == 0 && res.msg == 'NOT_LOGIN') {
+            userStore.logout()
+            router.replace('/login')
+            ElMessage.error('登录过期，请登重新登录！')
         }
         else {
             ElMessage.error(res.msg)
@@ -109,9 +124,15 @@ const handleDeleteUser = (id) => {
                 type: 'success'
             })
         }
+        else if (res.code == 0 && res.msg == 'NOT_LOGIN') {
+            userStore.logout()
+            router.replace('/login')
+            ElMessage.error('登录过期，请登重新登录！')
+        }
         else {
             ElMessage.error(res.msg)
         }
+        handleQuery()
     })
 }
 
@@ -122,11 +143,16 @@ const handleQuery = () => {
             console.log(res.data);
             userList.total = res.data.total
             userList.rows = res.data.rows
-            query.loading = false
+        }
+        else if (res.code == 0 && res.msg == 'NOT_LOGIN') {
+            userStore.logout()
+            router.replace('/login')
+            ElMessage.error('登录过期，请登重新登录！')
         }
         else {
             ElMessage.error(res.msg)
         }
+        query.loading = false
     })
 }
 
@@ -146,6 +172,24 @@ const handleSizeChange = (val) => {
 const handleCurrentChange = (val) => {
     query.page = val
     handleQuery()
+}
+
+const handleAvatarSuccess = (
+    response
+) => {
+    console.log(response);
+    dialogForm.data.certificateUrl = 'http://106.14.72.81:81/' + response.data
+}
+
+const beforeAvatarUpload = (rawFile) => {
+    if (rawFile.type != 'image/jpeg' && rawFile.type != 'image/jpg' && rawFile.type != 'image/png') {
+        ElMessage.error('请上传图片！')
+        return false
+    } else if (rawFile.size / 1024 / 1024 > 2) {
+        ElMessage.error('图片大小不能超过2M！')
+        return false
+    }
+    return true
 }
 
 handleQuery()
@@ -209,9 +253,20 @@ handleQuery()
                     {{ scope.row.orgId == null ? '无' : scope.row.orgId }}
                 </template>
             </el-table-column>
-            <el-table-column prop="certificateUrl" label="证书Url">
+            <el-table-column prop="certificateUrl" label="证书">
                 <template #default="scope">
-                    {{ (scope.row.certificateUrl == null || scope.row.certificateUrl=='') ? '无' : scope.row.certificateUrl }}
+                    <div style="display: flex; align-items: center">
+                        <el-image :preview-src-list="[scope.row.certificateUrl]" :src="scope.row.certificateUrl"
+                            hide-on-click-modal="true" preview-teleported="true">
+                            <template #placeholder>
+                                <div>加载中...</div>
+                            </template>
+                            <template #error>
+                                <div>无</div>
+                            </template>
+                        </el-image>
+
+                    </div>
                 </template>
             </el-table-column>
             <el-table-column prop="createTime" label="创建时间" />
@@ -246,7 +301,7 @@ handleQuery()
                     <el-input v-model="dialogForm.data.phone" />
                 </el-form-item>
                 <el-form-item label="用户类型">
-                    <el-select v-model="dialogForm.data.role">
+                    <el-select v-model="dialogForm.data.role" placeholder="选择用户类型">
                         <el-option label="管理员" value="管理员" />
                         <el-option label="渔民用户" value="渔民用户" />
                         <el-option label="普通用户" value="普通用户" />
@@ -256,8 +311,15 @@ handleQuery()
                 <el-form-item label="所属组织编号">
                     <el-input v-model="dialogForm.data.orgId" />
                 </el-form-item>
-                <el-form-item label="证书Url">
-                    <el-input v-model="dialogForm.data.certificateUrl" />
+                <el-form-item label="证书">
+                    <el-upload class="avatar-uploader" action="http://106.14.72.81:6615/upload" :show-file-list="false"
+                        :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
+                        <img v-if="dialogForm.data.certificateUrl" :src="dialogForm.data.certificateUrl"
+                            style="object-fit: contain;" class="avatar" />
+                        <el-icon v-else class="avatar-uploader-icon">
+                            <Plus />
+                        </el-icon>
+                    </el-upload>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -270,4 +332,35 @@ handleQuery()
             </template>
         </el-dialog>
     </div>
-</template>@/apis/user-api
+</template>
+
+<style scoped>
+.avatar-uploader .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+}
+</style>
+
+<style>
+.avatar-uploader .el-upload {
+    border: 1px dashed var(--el-border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: var(--el-transition-duration-fast);
+}
+
+.avatar-uploader .el-upload:hover {
+    border-color: var(--el-color-primary);
+}
+
+.el-icon.avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    text-align: center;
+}
+</style>

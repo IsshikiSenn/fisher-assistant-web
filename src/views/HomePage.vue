@@ -11,9 +11,9 @@ const logout = () => {
     userStore.logout();
 
     serverInstance.interceptors.request.use(config => {
-                config.headers['token']=''
-                return config
-            }, e => Promise.reject(e))
+        config.headers['token'] = ''
+        return config
+    }, e => Promise.reject(e))
     router.replace('/login');
 }
 const routeList = ['/users', '/orgs', '/articles', '/categorys', '/goods', '/orders']

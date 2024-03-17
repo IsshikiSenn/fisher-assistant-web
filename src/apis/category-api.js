@@ -13,7 +13,7 @@ export function useCategoryApi() {
     function addCategory(data) {
         return serverInstance({
             method: 'post',
-            url: '/categorys',
+            url: '/category',
             data: data
         })
     }
@@ -21,7 +21,7 @@ export function useCategoryApi() {
     function updateCategory(data) {
         return serverInstance({
             method: 'put',
-            url: '/categorys',
+            url: '/category',
             data: data
         })
     }
@@ -29,7 +29,7 @@ export function useCategoryApi() {
     function deleteCategory(id) {
         return serverInstance({
             method: 'delete',
-            url: '/categorys/' + id
+            url: '/category/' + id
         })
     }
 

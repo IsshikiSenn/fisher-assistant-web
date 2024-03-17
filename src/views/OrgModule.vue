@@ -2,7 +2,11 @@
 import { useOrgApi } from '@/apis/org-api'
 import { reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { useUserStore } from '@/stores/userStore';
+import { useRouter } from 'vue-router';
 
+const userStore = useUserStore()
+const router = useRouter()
 const orgApi = useOrgApi()
 const orgList = reactive({
     total: 0,
@@ -64,6 +68,11 @@ const handleAddOrg = (data) => {
                 type: 'success'
             })
         }
+        else if (res.code == 0 && res.msg == 'NOT_LOGIN') {
+            userStore.logout()
+            router.replace('/login')
+            ElMessage.error('登录过期，请登重新登录！')
+        }
         else {
             ElMessage.error(res.msg)
         }
@@ -79,6 +88,11 @@ const handleEditOrg = (data) => {
                 message: '编辑成功！',
                 type: 'success'
             })
+        }
+        else if (res.code == 0 && res.msg == 'NOT_LOGIN') {
+            userStore.logout()
+            router.replace('/login')
+            ElMessage.error('登录过期，请登重新登录！')
         }
         else {
             ElMessage.error(res.msg)
@@ -96,6 +110,11 @@ const handleDeleteOrg = (id) => {
                 type: 'success'
             })
         }
+        else if (res.code == 0 && res.msg == 'NOT_LOGIN') {
+            userStore.logout()
+            router.replace('/login')
+            ElMessage.error('登录过期，请登重新登录！')
+        }
         else {
             ElMessage.error(res.msg)
         }
@@ -109,11 +128,16 @@ const handleQuery = () => {
             console.log(res.data);
             orgList.total = res.data.total
             orgList.rows = res.data.rows
-            query.loading = false
+        }
+        else if (res.code == 0 && res.msg == 'NOT_LOGIN') {
+            userStore.logout()
+            router.replace('/login')
+            ElMessage.error('登录过期，请登重新登录！')
         }
         else {
             ElMessage.error(res.msg)
         }
+        query.loading = false
     })
 }
 

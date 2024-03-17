@@ -145,11 +145,11 @@ handleQuery()
     <div style="height: 100%;">
 
         <!-- 操作栏 -->
-        <el-row justify="space-around">
+        <el-row justify="space-between">
             <el-col :span="3">
                 <el-button type="primary" @click="showFormDialog('新增文章信息', null, handleAddArticle)">新增文章</el-button>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="8">
             </el-col>
             <el-col :span="5">
                 <el-form-item label="标题">

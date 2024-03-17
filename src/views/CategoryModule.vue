@@ -2,7 +2,11 @@
 import { useCategoryApi } from '@/apis/category-api'
 import { reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { useUserStore } from '@/stores/userStore';
+import { useRouter } from 'vue-router';
 
+const userStore = useUserStore()
+const router = useRouter()
 const categoryApi = useCategoryApi()
 const categoryList = reactive({
     total: 0,
@@ -63,6 +67,11 @@ const handleAddCategory = (data) => {
                 type: 'success'
             })
         }
+        else if (res.code == 0 && res.msg == 'NOT_LOGIN') {
+            userStore.logout()
+            router.replace('/login')
+            ElMessage.error('登录过期，请登重新登录！')
+        }
         else {
             ElMessage.error(res.msg)
         }
@@ -78,6 +87,11 @@ const handleEditCategory = (data) => {
                 message: '编辑成功！',
                 type: 'success'
             })
+        }
+        else if (res.code == 0 && res.msg == 'NOT_LOGIN') {
+            userStore.logout()
+            router.replace('/login')
+            ElMessage.error('登录过期，请登重新登录！')
         }
         else {
             ElMessage.error(res.msg)
@@ -95,9 +109,15 @@ const handleDeleteCategory = (id) => {
                 type: 'success'
             })
         }
+        else if (res.code == 0 && res.msg == 'NOT_LOGIN') {
+            userStore.logout()
+            router.replace('/login')
+            ElMessage.error('登录过期，请登重新登录！')
+        }
         else {
             ElMessage.error(res.msg)
         }
+        handleQuery()
     })
 }
 
@@ -110,9 +130,13 @@ const handleQuery = () => {
             categoryList.rows = res.data.rows
             query.loading = false
         }
+        else if (res.code == 0 && res.msg == 'NOT_LOGIN') {
+            userStore.logout()
+            router.replace('/login')
+            ElMessage.error('登录过期，请登重新登录！')
+        }
         else {
             ElMessage.error(res.msg)
-            query.loading = false
         }
     })
 }
@@ -130,6 +154,24 @@ const handleSizeChange = (val) => {
 const handleCurrentChange = (val) => {
     query.page = val
     handleQuery()
+}
+
+const handleAvatarSuccess = (
+    response
+) => {
+    console.log(response);
+    dialogForm.data.imgUrl = 'http://106.14.72.81:81/' + response.data
+}
+
+const beforeAvatarUpload = (rawFile) => {
+    if (rawFile.type != 'image/jpeg' && rawFile.type != 'image/jpg' && rawFile.type != 'image/png') {
+        ElMessage.error('请上传图片！')
+        return false
+    } else if (rawFile.size / 1024 / 1024 > 2) {
+        ElMessage.error('图片大小不能超过2M！')
+        return false
+    }
+    return true
 }
 
 handleQuery()
@@ -163,10 +205,25 @@ handleQuery()
         </el-row>
 
         <!-- 表格 -->
-        <el-table :data="categoryList.rows" height="85%">
+        <el-table :data="categoryList.rows" height="85%" table-layout="auto">
             <el-table-column prop="id" label="编号" width="60" />
             <el-table-column prop="name" label="类别名称" />
-            <el-table-column prop="imgUrl" label="图片Url" />
+            <el-table-column prop="imgUrl" label="图片">
+                <template #default="scope">
+                    <div style="display: flex; align-items: center; width: 100px; height: 100px;">
+                        <el-image :preview-src-list="[scope.row.imgUrl]" :src="scope.row.imgUrl"
+                            :hide-on-click-modal="true" :preview-teleported="true">
+                            <template #placeholder>
+                                <div>加载中...</div>
+                            </template>
+                            <template #error>
+                                <div>无</div>
+                            </template>
+                        </el-image>
+
+                    </div>
+                </template>
+            </el-table-column>
             <el-table-column prop="createTime" label="创建时间" />
             <el-table-column prop="updateTime" label="更新时间" />
             <!-- 操作按钮 -->
@@ -187,11 +244,18 @@ handleQuery()
         <!-- 对话框 -->
         <el-dialog v-model="dialogForm.visible" :title="dialogForm.dialogTitle" width="500">
             <el-form :model="dialogForm.data">
-                <el-form-item label="组织名称">
+                <el-form-item label="类别名称">
                     <el-input v-model="dialogForm.data.name" />
                 </el-form-item>
-                <el-form-item label="管理员编号">
-                    <el-input v-model="dialogForm.data.adminId" />
+                <el-form-item label="图片">
+                    <el-upload class="avatar-uploader" action="http://106.14.72.81:6615/upload" :show-file-list="false"
+                        :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
+                        <img v-if="dialogForm.data.imgUrl" :src="dialogForm.data.imgUrl"
+                            style="object-fit: contain;" class="avatar" />
+                        <el-icon v-else class="avatar-uploader-icon">
+                            <Plus />
+                        </el-icon>
+                    </el-upload>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -205,3 +269,34 @@ handleQuery()
         </el-dialog>
     </div>
 </template>
+
+<style scoped>
+.avatar-uploader .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+}
+</style>
+
+<style>
+.avatar-uploader .el-upload {
+    border: 1px dashed var(--el-border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: var(--el-transition-duration-fast);
+}
+
+.avatar-uploader .el-upload:hover {
+    border-color: var(--el-color-primary);
+}
+
+.el-icon.avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    text-align: center;
+}
+</style>
