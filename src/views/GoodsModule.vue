@@ -15,6 +15,7 @@ const query = reactive({
     page: 1,
     pageSize: 10,
     name: '',
+    categoryId: '',
     loading: false
 })
 const dialogForm = reactive({
@@ -134,7 +135,7 @@ const handleDeleteGoods = (id) => {
 
 const handleQuery = () => {
     query.loading = true
-    goodsApi.getGoods(query.page, query.pageSize, query.name).then((res) => {
+    goodsApi.getGoods(query.page, query.pageSize, query.name, query.categoryId).then((res) => {
         if (res.code == 1) {
             goodsList.total = res.data.total
             goodsList.rows = res.data.rows
@@ -153,6 +154,7 @@ const handleQuery = () => {
 
 const resetQuery = () => {
     query.name = ''
+    query.categoryId = ''
     handleQuery()
 }
 
@@ -195,10 +197,15 @@ handleQuery()
             <el-col :span="2">
                 <el-button type="primary" @click="showFormDialog('新增商品', null, handleAddGoods)">新增商品</el-button>
             </el-col>
-            <el-col :span="14"></el-col>
+            <el-col :span="9"></el-col>
             <el-col :span="5">
                 <el-form-item label="商品名称">
                     <el-input v-model="query.name" />
+                </el-form-item>
+            </el-col>
+            <el-col :span="5">
+                <el-form-item label="类别编号">
+                    <el-input v-model="query.categoryId" />
                 </el-form-item>
             </el-col>
             <el-col :span="1">

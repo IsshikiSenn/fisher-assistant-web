@@ -1,11 +1,12 @@
 import { serverInstance } from "@/utils/http"
 
 export function useGoodsApi() {
-    function getGoods(page, pageSize, name) {
+    function getGoods(page, pageSize, name, categoryId) {
         var url = '/goods?'
-        if (page != null) url = url + 'page=' + page + '&'
-        if (pageSize != null) url = url + 'pageSize=' + pageSize + '&'
-        if (name != '' && name != null) url = url + 'name=' + name
+        if (page != null) url = url + 'page=' + page
+        if (pageSize != null) url = url + '&pageSize=' + pageSize
+        if (name != '' && name != null) url = url + '&name=' + name
+        if (categoryId != '' && categoryId != null) url = url + '&categoryId=' + categoryId
         return serverInstance({
             method: 'get',
             url: url,
