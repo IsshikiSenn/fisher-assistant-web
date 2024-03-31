@@ -201,6 +201,7 @@ handleQuery()
             <el-col :span="4">
                 <el-form-item label="订单状态">
                     <el-select v-model="query.status" placeholder="选择订单状态" clearable>
+                        <el-option label="待确认" value="待确认" />
                         <el-option label="待发货" value="待发货" />
                         <el-option label="运输中" value="运输中" />
                         <el-option label="已签收" value="已签收" />
@@ -272,6 +273,7 @@ handleQuery()
                 </el-form-item>
                 <el-form-item label="订单状态">
                     <el-select v-model="dialogForm.data.status" placeholder="选择订单状态">
+                        <el-option label="待确认" value="待确认" />
                         <el-option label="待发货" value="待发货" />
                         <el-option label="运输中" value="运输中" />
                         <el-option label="已签收" value="已签收" />
