@@ -33,7 +33,8 @@ const dialogForm = reactive({
         status: '',
         startLocation: '',
         endLocation: '',
-        transportId: ''
+        transportId: '',
+        currentLocation: ''
     },
     file: null,
     onConfirm: null
@@ -53,7 +54,8 @@ const showFormDialog = (title, data, onConfirm) => {
             status: '',
             startLocation: '',
             endLocation: '',
-            transportId: ''
+            transportId: '',
+            currentLocation: ''
         }
 
     }
@@ -233,11 +235,24 @@ handleQuery()
             <el-table-column prop="amount" label="数量" />
             <el-table-column prop="totalPrice" label="总价" />
             <el-table-column prop="status" label="订单状态" />
-            <el-table-column prop="startLocation" label="发货地址"></el-table-column>
-            <el-table-column prop="endLocation" label="收货地址"></el-table-column>
+            <el-table-column prop="startLocation" label="发货地址">
+                <template #default="scope">
+                    {{ scope.row.startLocation == null ? '无' : scope.row.startLocation }}
+                </template>
+            </el-table-column>
+            <el-table-column prop="endLocation" label="收货地址">
+                <template #default="scope">
+                    {{ scope.row.endLocation == null ? '无' : scope.row.endLocation }}
+                </template>
+            </el-table-column>
             <el-table-column prop="transportId" label="运输编号">
                 <template #default="scope">
                     {{ scope.row.transportId == null ? '无' : scope.row.transportId }}
+                </template>
+            </el-table-column>
+            <el-table-column prop="currentLocation" label="当前位置">
+                <template #default="scope">
+                    {{ scope.row.currentLocation == null ? '无' : scope.row.currentLocation }}
                 </template>
             </el-table-column>
             <el-table-column prop="createTime" label="创建时间" />
@@ -287,6 +302,9 @@ handleQuery()
                 </el-form-item>
                 <el-form-item label="运输编号">
                     <el-input v-model="dialogForm.data.transportId" />
+                </el-form-item>
+                <el-form-item label="当前位置">
+                    <el-input v-model="dialogForm.data.currentLocation" />
                 </el-form-item>
             </el-form>
             <template #footer>
