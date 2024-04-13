@@ -206,7 +206,7 @@ handleQuery()
                         <el-option label="待确认" value="待确认" />
                         <el-option label="待发货" value="待发货" />
                         <el-option label="运输中" value="运输中" />
-                        <el-option label="已签收" value="已签收" />
+                        <el-option label="已送达" value="已送达" />
                     </el-select>
                 </el-form-item>
             </el-col>
@@ -260,7 +260,7 @@ handleQuery()
             <!-- 操作按钮 -->
             <el-table-column label="操作" width="140">
                 <template #default="scope">
-                    <el-button size="small" @click="showFormDialog('编辑用户信息', scope.row, handleEditOrder)">编辑</el-button>
+                    <el-button size="small" @click="showFormDialog('编辑订单信息', scope.row, handleEditOrder)">编辑</el-button>
                     <el-button size="small" type="danger" @click="showDeleteDialog(scope.row.id)">删除</el-button>
                 </template>
             </el-table-column>
@@ -291,7 +291,7 @@ handleQuery()
                         <el-option label="待确认" value="待确认" />
                         <el-option label="待发货" value="待发货" />
                         <el-option label="运输中" value="运输中" />
-                        <el-option label="已签收" value="已签收" />
+                        <el-option label="已送达" value="已送达" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="发货地址">
